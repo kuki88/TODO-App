@@ -44,6 +44,12 @@ namespace TODO_App.Controllers
             var zadaci = _zadatakService.DohvatiZadatkePoStatusu(status);
             return Ok(zadaci);
         }
+        [HttpGet("dohvati-zadatke-by-korisnik")]
+        public IActionResult DohvatiZadatkePoKorisniku(int? id)
+        {
+            var zadaci = _zadatakService.DohvatiZadatkePoKorisniku(id);
+            return Ok(zadaci);
+        }
         [HttpPut("update-zadatak-by-id/{id}")]
         public IActionResult UpdateZadatakById(int id, [FromBody]ZadatakVM zadatak)
         {

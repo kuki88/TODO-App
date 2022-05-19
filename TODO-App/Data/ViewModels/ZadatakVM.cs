@@ -8,6 +8,6 @@ namespace TODO_App.Data.ViewModels
         public bool Status { get; set; }
         public DateTime ZavrsniDatum { get; set; }
         public DateTime? DatumZavrsetka { get; set; }
-        public int KorisnikId { get; set; }
+        public int? KorisnikId { get; set; }
     }
 }

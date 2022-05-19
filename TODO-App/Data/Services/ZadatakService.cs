@@ -13,24 +13,47 @@ namespace TODO_App.Data.Services
 
         public void DodajZadatak(ZadatakVM zadatak)
         {
-            bool korIsNull = _context.Korisnici.FirstOrDefault(k => k.Id == zadatak.KorisnikId) == null;
+            var korisnik = _context.Korisnici.FirstOrDefault(k => k.Id == zadatak.KorisnikId);
             var _zadatak = new Zadatak()
             {
                 Opis = zadatak.Opis,
                 Status = zadatak.Status,
                 ZavrsniDatum = zadatak.ZavrsniDatum,
                 DatumZavrsetka = zadatak.Status ? zadatak.DatumZavrsetka : null,
-                KorisnikId = korIsNull ? zadatak.KorisnikId : 3,
+                KorisnikId = isKorisnikNull(zadatak) ? null : zadatak.KorisnikId,
             };
             _context.Zadaci.Add(_zadatak);
             _context.SaveChanges();
         }
 
 
-        public List<Zadatak> DohvatiZadatak() => _context.Zadaci.ToList();
+        public List<Zadatak> DohvatiZadatak()
+        {
+            var _zadaci = _context.Zadaci.ToList();
+
+            foreach (var item in _zadaci)
+            {
+                item.Korisnik = _context.Korisnici.FirstOrDefault(k => k.Id == item.KorisnikId);
+            }
+
+            return _zadaci;
+        }
         public List<Zadatak> DohvatiZadatkePoStatusu(bool zavrsen)
         {
             var _zadaci = _context.Zadaci.Where(z => z.Status == zavrsen).ToList();
+            foreach (var item in _zadaci)
+            {
+                item.Korisnik = _context.Korisnici.FirstOrDefault(k => k.Id == item.KorisnikId);
+            }
+            return _zadaci;
+        }
+        public List<Zadatak> DohvatiZadatkePoKorisniku(int? id)
+        {
+            var _zadaci = _context.Zadaci.Where(z => z.KorisnikId == id).ToList();
+            foreach (var item in _zadaci)
+            {
+                item.Korisnik = _context.Korisnici.FirstOrDefault(k => k.Id == item.KorisnikId);
+            }
             return _zadaci;
         }
         public Zadatak DohvatiZadatakById(int zadatakId) => _context.Zadaci.FirstOrDefault(z => z.Id == zadatakId);
@@ -43,6 +66,7 @@ namespace TODO_App.Data.Services
                 _zad.Status = zadatak.Status;
                 _zad.ZavrsniDatum = zadatak.ZavrsniDatum;
                 _zad.DatumZavrsetka = zadatak.Status ? zadatak.DatumZavrsetka : null;
+                _zad.KorisnikId = isKorisnikNull(zadatak) ? null : zadatak.KorisnikId;
 
                 _context.SaveChanges();
             }
@@ -56,6 +80,11 @@ namespace TODO_App.Data.Services
                 _context.Zadaci.Remove(_zadatak);
                 _context.SaveChanges();
             }
+        }
+        
+        public bool isKorisnikNull(ZadatakVM zadatak)
+        {
+            return _context.Korisnici.FirstOrDefault(k => k.Id == zadatak.KorisnikId) == null;
         }
     }
 }
