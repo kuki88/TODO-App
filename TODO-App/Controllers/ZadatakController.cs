@@ -22,8 +22,15 @@ namespace TODO_App.Controllers
         [HttpPost("dodaj-zadatak")]
         public IActionResult DodajZadatak([FromBody]ZadatakVM zadatak)
         {
-            _zadatakService.DodajZadatak(zadatak);
-            return Ok();
+            try
+            { 
+                var noviZadatak = _zadatakService.DodajZadatak(zadatak);
+                return Created(nameof(DodajZadatak), noviZadatak);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet("dohvati-zadatke")]
@@ -41,14 +48,28 @@ namespace TODO_App.Controllers
         [HttpGet("dohvati-zadatke-by-status/{status}")]
         public IActionResult DohvatiZadatkePoStatusu(bool status)
         {
-            var zadaci = _zadatakService.DohvatiZadatkePoStatusu(status);
-            return Ok(zadaci);
+            try
+            {
+                var zadaci = _zadatakService.DohvatiZadatkePoStatusu(status);
+                return Ok(zadaci);
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
-        [HttpGet("dohvati-zadatke-by-korisnik")]
+        [HttpGet("dohvati-zadatke-by-korisnik/{id}")]
         public IActionResult DohvatiZadatkePoKorisniku(int? id)
         {
-            var zadaci = _zadatakService.DohvatiZadatkePoKorisniku(id);
-            return Ok(zadaci);
+            try
+            {
+                var zadaci = _zadatakService.DohvatiZadatkePoKorisniku(id);
+                return Ok(zadaci);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         [HttpPut("update-zadatak-by-id/{id}")]
         public IActionResult UpdateZadatakById(int id, [FromBody]ZadatakVM zadatak)
@@ -59,8 +80,15 @@ namespace TODO_App.Controllers
         [HttpDelete("izbrisi-zadatak-by-id/{id}")]
         public IActionResult IzbrisiZadatakById(int id)
         {
-            _zadatakService.IzbrisiZadatakById(id);
-            return Ok(_zadatakService);
+            try
+            {
+                _zadatakService.IzbrisiZadatakById(id);
+                return Ok(_zadatakService);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
     }

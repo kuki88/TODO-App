@@ -11,7 +11,7 @@ namespace TODO_App.Data.Services
             _context = context;
         }
 
-        public void DodajZadatak(ZadatakVM zadatak)
+        public Zadatak DodajZadatak(ZadatakVM zadatak)
         {
             var korisnik = _context.Korisnici.FirstOrDefault(k => k.Id == zadatak.KorisnikId);
             var _zadatak = new Zadatak()
@@ -24,6 +24,8 @@ namespace TODO_App.Data.Services
             };
             _context.Zadaci.Add(_zadatak);
             _context.SaveChanges();
+            
+            return _zadatak;
         }
 
 
@@ -40,12 +42,19 @@ namespace TODO_App.Data.Services
         }
         public List<Zadatak> DohvatiZadatkePoStatusu(bool zavrsen)
         {
-            var _zadaci = _context.Zadaci.Where(z => z.Status == zavrsen).ToList();
-            foreach (var item in _zadaci)
+            try
             {
-                item.Korisnik = _context.Korisnici.FirstOrDefault(k => k.Id == item.KorisnikId);
+                var _zadaci = _context.Zadaci.Where(z => z.Status == zavrsen).ToList();
+                foreach (var item in _zadaci)
+                {
+                    item.Korisnik = _context.Korisnici.FirstOrDefault(k => k.Id == item.KorisnikId);
+                }
+                return _zadaci;
             }
-            return _zadaci;
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
         public List<Zadatak> DohvatiZadatkePoKorisniku(int? id)
         {
@@ -54,9 +63,23 @@ namespace TODO_App.Data.Services
             {
                 item.Korisnik = _context.Korisnici.FirstOrDefault(k => k.Id == item.KorisnikId);
             }
-            return _zadaci;
+
+            if (_zadaci != null) return _zadaci;
+            else throw new Exception("Korisnik nema ni jedan zadatak!");
         }
-        public Zadatak DohvatiZadatakById(int zadatakId) => _context.Zadaci.FirstOrDefault(z => z.Id == zadatakId);
+        public Zadatak DohvatiZadatakById(int zadatakId)
+        {
+            try
+            {
+                var _zad = _context.Zadaci.FirstOrDefault(z => z.Id == zadatakId);
+                if (_zad != null) return _zad;
+                else throw new Exception("Ne postoji zadatak sa traženim ID-em");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        } 
         public Zadatak UpdateZadatakById(int zadatakId, ZadatakVM zadatak)
         {
             var _zad = _context.Zadaci.FirstOrDefault(z => z.Id == zadatakId);
@@ -80,6 +103,7 @@ namespace TODO_App.Data.Services
                 _context.Zadaci.Remove(_zadatak);
                 _context.SaveChanges();
             }
+            else throw new Exception($"Zadatak sa ID: {zadatakId} ne postoji!");
         }
         
         public bool isKorisnikNull(ZadatakVM zadatak)
